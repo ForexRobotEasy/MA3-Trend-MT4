@@ -1,0 +1,132 @@
+
+//+------------------------------------------------------------------+
+//|                                      MA3 Trend MT4              |
+//|                         https://forexroboteasy.com               |
+//|                                Forex Robot Easy Team              |
+//+------------------------------------------------------------------+
+
+#property strict
+
+//+------------------------------------------------------------------+
+//| Global variables                                                  |
+//+------------------------------------------------------------------+
+int maPeriod = 3; // Number of bars for moving average calculation
+
+//+------------------------------------------------------------------+
+//| Custom indicator input parameters                                 |
+//+------------------------------------------------------------------+
+input string asset = 'EURUSD'; // Selected asset
+input ENUM_TIMEFRAMES timeframe = PERIOD_H1; // Selected timeframe
+
+//+------------------------------------------------------------------+
+//| Custom indicator buffers                                           |
+//+------------------------------------------------------------------+
+double maBuffer[]; // Moving average buffer
+
+//+------------------------------------------------------------------+
+//| Expert initialization function                                    |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+    // Indicator buffers mapping
+    SetIndexBuffer(0, maBuffer, INDICATOR_DATA);
+    
+    // Set indicator label
+    IndicatorSetString(INDICATOR_SHORTNAME, 'MA3 Trend MT4');
+    
+    // Set indicator parameters
+    IndicatorSetString(0, INDICATOR_LABEL, 'MA3 Trend');
+    
+    // Set indicator colors
+    IndicatorSetInteger(0, INDICATOR_DIGITS, 5);
+    IndicatorSetInteger(0, INDICATOR_COLOR, clrBlue);
+    
+    return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Expert deinitialization function                                  |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+    // Remove indicator buffers
+    ArrayFree(maBuffer);
+}
+
+//+------------------------------------------------------------------+
+//| Expert tick function                                              |
+//+------------------------------------------------------------------+
+void OnTick()
+{
+    // Calculate moving average
+    CalculateMA();
+    
+    // Generate signals
+    GenerateSignals();
+    
+    // Confirm and display signals
+    ConfirmAndDisplaySignals();
+}
+
+//+------------------------------------------------------------------+
+//| Calculate moving average                                          |
+//+------------------------------------------------------------------+
+void CalculateMA()
+{
+    int countedBars = IndicatorCounted();
+    int limit = Bars - countedBars;
+    
+    for (int i = limit; i >= 0; i--)
+    {
+        double sum = 0.0;
+        
+        for (int j = 0; j < maPeriod; j++)
+        {
+            sum += Close[i + j];
+        }
+        
+        maBuffer[i] = sum / maPeriod;
+    }
+}
+
+//+------------------------------------------------------------------+
+//| Generate signals                                                  |
+//+------------------------------------------------------------------+
+void GenerateSignals()
+{
+    int signal;
+    
+    for (int i = Bars - 1; i >= 0; i--)
+    {
+        if (Close[i] > maBuffer[i])
+        {
+            signal = 1; // Long signal
+        }
+        else if (Close[i] < maBuffer[i])
+        {
+            signal = -1; // Short signal
+        }
+        else
+        {
+            signal = 0; // No signal
+        }
+        
+        // TODO: Implement signal handling logic
+    }
+}
+
+//+------------------------------------------------------------------+
+//| Confirm and display signals                                       |
+//+------------------------------------------------------------------+
+void ConfirmAndDisplaySignals()
+{
+    // TODO: Implement signal confirmation and display logic
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator error handling function                          |
+//+------------------------------------------------------------------+
+void OnChartEvent(const int id, const long& lparam, const double& dparam, const string& sparam)
+{
+    // Handle indicator errors or exceptions here
+}
